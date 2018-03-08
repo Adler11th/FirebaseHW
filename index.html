@@ -8,13 +8,36 @@
     <title>Document</title>
     <link rel="stylesheet" href="assets/reset.css">
     <link rel="stylesheet" href="assets/style.css">
+
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
     <script src="https://www.gstatic.com/firebasejs/4.10.1/firebase.js"></script>
-    <script src="assets/script.js"></script>
+    <script src="assets/game.js"></script>
+    <script src="assets/chat.js"></script>
 </head>
 
 <body>
-
+<header>
+    <h1>Rock-Paper-Scissors</h1>
+</header>
+<section>
+    <div class="player-card" id="player-one">
+        <p>Click to become player!</p>
+    </div>
+    <div class="dialog-card">
+        <p>Waiting for players...</p>
+    </div>
+    <div class= "player-card" id="player-two">
+        <p>Click to become player!</p>
+    </div>
+</section>
+<article>
+    <form>
+        <h2>Chat</h2>
+        <textarea readonly="true" rows = 10 name="comment" id = "comment-display"></textarea>
+        <input type="text" id="comment-input">
+        <input type ="submit" value="Sumbmit" id="submit-chat">
+    </form>
+</article>
 </body>
 
 </html>
