@@ -1,7 +1,5 @@
 $(document).ready(()=>{
-
-    chatRef = DATA.ref("chat");
-
+    chatRef = firebase.database().ref("chat");
     $("#submit-chat").on("click", function(event){
         event.preventDefault();
         var text = $("#comment-input").val();
@@ -10,14 +8,13 @@ $(document).ready(()=>{
         });
         $("#comment-input").val("");
     });
-
     chatRef.on("value", function(snapshot){
-        var keys = snapshot.val();
+        var chat = snapshot.val();
         $("#comment-display").val("");
         var text = '';
-        for (var key in keys){
-            if(keys.hasOwnProperty(key)){
-                text += keys[key].text+'\n';
+        for (var key in chat){
+            if(chat.hasOwnProperty(key)){
+                text += chat[key].text+'\n';
             }
         }
         $("#comment-display").val(text+"\n");
