@@ -9,28 +9,36 @@
           event.preventDefault();
           var playerName = $("#player-name").val();
           $("#player-name").val("");
-          if (!isGameStarted) {
-              if (playerName.length != 0) {
-                  if (!isPlayerOne) {
-                      DATA.ref("players/player1").set({
-                          name: playerName,
-                          wins: 0,
-                          looses: 0,
-                      });
-                      isPlayerOne = true;
+          if (playerName.length != 0) {
+              //=======================================
+              DATA.ref("players").on("value", function (snapshot) {
+                  if (snapshot.child("player1").exists() && snapshot.child("player2").exists()) {
+                      $(".dialog-card p").text("Ready");
+                      isGameStarted = true;
+                      makeChoice();
+                      console.log("GameStarted");
                   } else {
-                      if (!isPlayerTwo) {
+                      if (snapshot.child("player1").exists()) {
                           DATA.ref("players/player2").set({
                               name: playerName,
                               wins: 0,
                               looses: 0,
                           });
-                          isPlayerTwo = true;
+                          $(".dialog-card p").text("player1 is ready");
+                          isGameStarted = false;
+                      } else {
+                          if (snapshot.child("player2").exists()) {
+                              DATA.ref("players/player1").set({
+                                  name: playerName,
+                                  wins: 0,
+                                  looses: 0,
+                              });
+                              isGameStarted = false;
+                          }
+
                       }
                   }
-              } else {
-                  alert("Please enter your name, before starting a game");
-              }
+              });
           }
       });
 //Tracks if players were choosen to deploy game buttons
@@ -70,24 +78,6 @@
           $("#player-two").append("<h2>Waiting..<h2>");
           isGameStarted = false;
           isPlayerTwo = false;
-      });
-
-      DATA.ref("players").on("value", function (snapshot) {
-          if (snapshot.child("player1").exists() && snapshot.child("player2").exists()) {
-              $(".dialog-card p").text("Ready");
-              isGameStarted = true;
-              makeChoice();
-              console.log("GameStarted");
-          } else {
-              if (snapshot.child("player1").exists()) {
-                  $(".dialog-card p").text("player1 is ready");
-              } else {
-                  if (snapshot.child("player2").exists()) {
-                      $(".dialog-card p").text("player2 is ready");
-                  }
-
-              }
-          }
       });
 
       DATA.ref("choice").on("value", function (snap) {
