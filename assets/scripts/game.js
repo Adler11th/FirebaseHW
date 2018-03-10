@@ -1,12 +1,11 @@
 const DATA = firebase.database();
-var isGameStarted = false;
 
 $(document).ready(function () {
     $("#submit-player").on("click", function (event) {
         event.preventDefault();
         var playerName = $("#player-name").val();
-        $("#player-name").val("");
         if (playerName.length != 0) {
+            $("#player-name").val("");
             DATA.ref("players").once("value", (snap) => {
                 if (!snap.child("player-one").exists()) {
                     DATA.ref("players/player-one").set({
@@ -42,11 +41,12 @@ $(document).ready(function () {
             $("#player-two").css("display", "block");
         } catch (e) { }
     });
-
+    //starts round
     DATA.ref("players").on("value", (snap) => {
         if (snap.child("player-one").exists() && snap.child("player-two").exists()) {
-            startRound();
-        };
+            round();
+        }
+        
     });
 
     $("#pone-dc").on("click", function () {
@@ -61,38 +61,53 @@ $(document).ready(function () {
         $("#player-two h2").text("Waiting..");
     });
 
-    DATA.ref("choice").on("value", function (snap) {
+    DATA.ref("choice").on("value", (snap)=> {
         if (snap.child("player-one").exists() && snap.child("player-two").exists()) {
-            var p1 = snap.child("player-one").val();
-            var p2 = snap.child("player-two").val();
-            if ((p1 == "rock" && p2 == "rock") || (p1 == "paper" && p2 == "paper") || (p1 == "scissors" && p2 == "scissors")) {
-                $(".dialog-card *").remove();
-                $(".dialog-card").append("<h2>DRAW!</h2>");
-                DATA.ref("choice").remove();
+            compare(snap);
+            DATA.ref("choice").remove();
+        }
+    });
+    //========================================================================================
+    //Functions
+    //========================================================================================
+    function round(){
+        $(".pone-choice").on("click.choicePone", pOneClick);
+        $(".ptwo-choice").on("click.choicePtwo", pTwoClick);
+    };
+
+    function pOneClick(){
+        DATA.ref("choice/player-one").set($(this).attr("data"));
+    };
+
+    function pTwoClick(){
+        DATA.ref("choice/player-two").set($(this).attr("data"));
+    };
+
+    function compare(snap) {
+        const p1 = snap.child("player-one").val();
+        const p2 = snap.child("player-two").val();
+        if ((p1 == "rock" && p2 == "rock") || (p1 == "paper" && p2 == "paper") || (p1 == "scissors" && p2 == "scissors")) {
+            console.log("Draw");
+        } else {
+            if ((p1 == "rock" && p2 == "scissors") || (p1 == "paper" && p2 == "rock") || (p1 == "scissors" && p2 == "paper")) {
+                console.log("PlayerOne wins");
+                DATA.ref("players/player-one/wins").transaction((wins)=>{
+                    return (wins || 0) + 1;
+                });
+                DATA.ref("players/player-two/looses").transaction((looses)=>{
+                    return (looses || 0) + 1;
+                });
             } else {
-                if ((p1 == "rock" && p2 == "scissors") || (p1 == "paper" && p2 == "rock") || (p1 == "scissors" && p2 == "paper")) {
-                    $(".dialog-card *").remove();
-                    $(".dialog-card").append("<h2>Player one wins!</h2>");
-                    DATA.ref("choice").remove();
-                } else {
-                    if ((p1 == "rock" && p2 == "paper") || (p1 == "paper" && p2 == "scissors") || (p1 == "scissors" && p2 == "rock")) {
-                        $(".dialog-card *").remove();
-                        $(".dialog-card").append("<h2>Player two wins!</h2>");
-                        DATA.ref("choice").remove();
-                    }
+                if ((p1 == "rock" && p2 == "paper") || (p1 == "paper" && p2 == "scissors") || (p1 == "scissors" && p2 == "rock")) {
+                    console.log("PlayerTwo wins");
+                    DATA.ref("players/player-two/wins").transaction((wins)=>{
+                        return (wins || 0) + 1;
+                    });
+                    DATA.ref("players/player-one/looses").transaction((looses)=>{
+                        return (looses || 0) + 1;
+                    });
                 }
             }
         }
-    });
-    function startRound() {
-        console.log("New Round");
-        $(".pone-choice").on("click", function () {
-            DATA.ref("choice/player-one").set($(this).attr("data"));
-            console.log($(this).attr("data"));
-        });
-        $(".ptwo-choice").on("click", function () {
-            DATA.ref("choice/player-two").set($(this).attr("data"));
-            console.log($(this).attr("data"));
-        });
-    };
+    }
 });
