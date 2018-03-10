@@ -1,5 +1,7 @@
 $(document).ready(()=>{
-    chatRef = firebase.database().ref("chat");
+
+    const chatRef = firebase.database().ref("chat");
+
     $("#submit-chat").on("click", function(event){
         event.preventDefault();
         var text = $("#comment-input").val();
@@ -8,6 +10,11 @@ $(document).ready(()=>{
         });
         $("#comment-input").val("");
     });
+    $("#clear-chat").on("click", function(event){
+        event.preventDefault();
+        chatRef.remove();
+    });
+
     chatRef.on("value", function(snapshot){
         var chat = snapshot.val();
         $("#comment-display").val("");

@@ -25,14 +25,22 @@
     </form>
 </header>
 <section>
-    <div class="player-card" id="player-one">
+    <div class="player-card" id="player-one" style="display:none">
         <h2>Waiting...</h2>
+        <img class = 'choice-img pone-choice' src='assets/img/rock.png' data = 'rock'>
+        <img class = 'choice-img pone-choice' src='assets/img/paper.png' data ='paper'>
+        <img class = 'choice-img pone-choice' src='assets/img/scissors.png' data = 'scissors'>
+        <button class = 'dc-btn' id='pone-dc' value = 'Quit'>Quit</button>
     </div>
     <div class="dialog-card">
         <p>Waiting for players...</p>
     </div>
-    <div class= "player-card" id="player-two">
+    <div class= "player-card" id="player-two" style="display:none">
         <h2>Waiting...</h2>
+        <img class = 'choice-img ptwo-choice' src='assets/img/rock.png' data = 'rock'>
+        <img class = 'choice-img ptwo-choice' src='assets/img/paper.png' data ='paper'>
+        <img class = 'choice-img ptwo-choice' src='assets/img/scissors.png' data = 'scissors'>
+        <button class = 'dc-btn' id='ptwo-dc' value = 'Quit'>Quit</button>
     </div>
 </section>
 <article>
@@ -40,7 +48,8 @@
         <h2>Chat</h2>
         <textarea readonly="true" rows = 10 name="comment" id = "comment-display"></textarea>
         <input type="text" id="comment-input">
-        <input type ="submit" value="Sumbmit" id="submit-chat">
+        <input type ="submit" value="send" id="submit-chat">
+        <input type= "submit"   value ="clear" id="clear-chat">
     </form>
 </article>
 </body>
