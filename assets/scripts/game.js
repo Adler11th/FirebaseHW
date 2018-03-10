@@ -2,7 +2,6 @@ const DATA = firebase.database();
 var isGameStarted = false;
 
 $(document).ready(function () {
-
     $("#submit-player").on("click", function (event) {
         event.preventDefault();
         var playerName = $("#player-name").val();
@@ -90,12 +89,10 @@ $(document).ready(function () {
         $(".pone-choice").on("click", function () {
             DATA.ref("choice/player-one").set($(this).attr("data"));
             console.log($(this).attr("data"));
-            $(".pone-choice").off("click");
         });
         $(".ptwo-choice").on("click", function () {
             DATA.ref("choice/player-two").set($(this).attr("data"));
             console.log($(this).attr("data"));
-            $(".ptwo-choice").off("click", ".ptwo-choice");
         });
     };
 });
