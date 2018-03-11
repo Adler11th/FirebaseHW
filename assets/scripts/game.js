@@ -13,14 +13,16 @@ $(document).ready(function () {
                     DATA.ref("players/player-one").set({
                         name: playerName,
                         wins: 0,
-                        looses: 0
+                        looses: 0,
+                        draws: 0
                     });
                 } else {
                     if (!snap.child("player-two").exists()) {
                         DATA.ref("players/player-two").set({
                             name: playerName,
                             wins: 0,
-                            looses: 0
+                            looses: 0,
+                            draws: 0
                         });
                     } else {
                         alert("We are packed!");
@@ -29,7 +31,7 @@ $(document).ready(function () {
             });
         }else{alert("Please enter valid name");}
     });
-    //Tracks if players were choosen to display game buttons
+    //Tracks if players were choosen to display/hide game buttons
     DATA.ref("players/player-one/name").on("value", function (snap) {
         try {
             if(snap.val()!=null){
@@ -62,7 +64,22 @@ $(document).ready(function () {
     //starts round
     DATA.ref("players").on("value", (snap) => {
         if (snap.child("player-one").exists() && snap.child("player-two").exists()) {
-            round();
+            setTimeout(round, 2000);
+        }
+    });
+    DATA.ref("players/player-one/wins").on("value", (snap)=>{
+        if(snap.val()!=0&&snap.val()!=null){
+            $(".dialog-card").text("Player 1 wins");
+        }
+    });
+    DATA.ref("players/player-two/wins").on("value", (snap)=>{
+        if(snap.val()!=0&&snap.val()!=null){
+            $(".dialog-card").text("Player 2 wins");
+        }
+    });
+    DATA.ref("players/player-two/draws").on("value",(snap)=>{
+        if(snap.val()!=0&&snap.val()!=null){
+            $(".dialog-card").text("DRAW!");
         }
     });
 
@@ -75,23 +92,6 @@ $(document).ready(function () {
         DATA.ref("players/player-two").remove();
         DATA.ref("choice").remove();
     });
-
-    function backWards(){
-    DATA.ref("choice").once("value", function(snap) {
-        if(snap.child("player-one").exists()){
-            $(".dialog-card").text("Player1 made his choice..");
-        }
-        if(snap.child("player-two").exists()){
-                $(".dialog-card").text("Player2 made his choice..");
-        }
-        
-        if (snap.child("player-one").exists() && snap.child("player-two").exists()) {
-            compare(snap);
-            DATA.ref("choice").off("value");
-            DATA.ref("choice").remove();
-        }
-    });
-}
 
     DATA.ref("players/player-one/wins").on("value", (snap)=>{
         $("#pone-wins").text(snap.val());
@@ -110,45 +110,74 @@ $(document).ready(function () {
     //Functions
     //========================================================================================
     function round(){
+        $(".dialog-card").text("New Round!");
         $(".pone-choice").on("click.choicePone", pOneClick);
         $(".ptwo-choice").on("click.choicePtwo", pTwoClick);
     };
 
     function pOneClick(){
         DATA.ref("choice").off("value");
+        $(".pone-choice").off("click.choicePone");
         DATA.ref("choice/player-one").set($(this).attr("data"));
         backWards();
     };
 
     function pTwoClick(){
         DATA.ref("choice").off("value");
+        $(".ptwo-choice").on("click.choicePtwo");
         DATA.ref("choice/player-two").set($(this).attr("data"));
         backWards();
     };
+
+    function backWards(){
+        DATA.ref("choice").once("value", function(snap) {
+            if(snap.child("player-one").exists()){
+                $(".dialog-card").text("You made your choice.. Waiting on other player");
+            }
+            if(snap.child("player-two").exists()){
+                $(".dialog-card").text("You made your choice.. Waiting on other player");
+            }
+            
+            if (snap.child("player-one").exists() && snap.child("player-two").exists()) {
+                compare(snap);
+                DATA.ref("choice").off("value");
+                DATA.ref("choice").remove();
+            }
+        });
+    }
 
     function compare(snap) {
         const p1 = snap.child("player-one").val();
         const p2 = snap.child("player-two").val();
         if ((p1 == "rock" && p2 == "rock") || (p1 == "paper" && p2 == "paper") || (p1 == "scissors" && p2 == "scissors")) {
             $(".dialog-card").text("Draw");
+
+                    DATA.ref("players/player-one/draws").transaction((draws)=>{
+                        return (draws || 0) + 1;
+                    });
+                    DATA.ref("players/player-two/draws").transaction((draws)=>{
+                        return (draws || 0) + 1;
+                    });
         } else {
             if ((p1 == "rock" && p2 == "scissors") || (p1 == "paper" && p2 == "rock") || (p1 == "scissors" && p2 == "paper")) {
-                $(".dialog-card").text("Player 1 wins");
-                DATA.ref("players/player-one/wins").transaction((wins)=>{
-                    return (wins || 0) + 1;
-                });
-                DATA.ref("players/player-two/looses").transaction((looses)=>{
-                    return (looses || 0) + 1;
-                });
-            } else {
-                if ((p1 == "rock" && p2 == "paper") || (p1 == "paper" && p2 == "scissors") || (p1 == "scissors" && p2 == "rock")) {
-                    $(".dialog-card").text("Player 2 wins");
-                    DATA.ref("players/player-two/wins").transaction((wins)=>{
+
+                    DATA.ref("players/player-one/wins").transaction((wins)=>{
                         return (wins || 0) + 1;
                     });
-                    DATA.ref("players/player-one/looses").transaction((looses)=>{
+                    DATA.ref("players/player-two/looses").transaction((looses)=>{
                         return (looses || 0) + 1;
                     });
+               
+            } else {
+                if ((p1 == "rock" && p2 == "paper") || (p1 == "paper" && p2 == "scissors") || (p1 == "scissors" && p2 == "rock")) {
+    
+                        DATA.ref("players/player-two/wins").transaction((wins)=>{
+                            return (wins || 0) + 1;
+                        });
+                        DATA.ref("players/player-one/looses").transaction((looses)=>{
+                            return (looses || 0) + 1;
+                        });
+                    
                 }
             }
         }
