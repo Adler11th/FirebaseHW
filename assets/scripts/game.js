@@ -27,28 +27,43 @@ $(document).ready(function () {
                     }
                 }
             });
-        }
+        }else{alert("Please enter valid name");}
     });
     //Tracks if players were choosen to display game buttons
-    DATA.ref("players/player-one").on("value", function (snap) {
+    DATA.ref("players/player-one/name").on("value", function (snap) {
         try {
-            $("#player-one h2").text(snap.val().name);
+            if(snap.val()!=null){
+            $("#player-one h2").text(snap.val());
             $("#player-one").show();
-        } catch (e) { }
+            $(".dialog-card").text("Player1 is READY!");
+            }else{
+            $("#player-one").hide();
+            $(".dialog-card").text("Player1 disconnected...");
+            }
+        } catch (e) {
+            console.log(e.message);
+         }
     });
 
-    DATA.ref("players/player-two").on("value", function (snap) {
+    DATA.ref("players/player-two/name").on("value", function (snap) {
         try {
-            $("#player-two h2").text(snap.val().name);
-            $("#player-two").show();
-        } catch (e) { }
+            if(snap.val()!=null){
+                $("#player-two h2").text(snap.val());
+                $("#player-two").show();
+                $(".dialog-card").text("Player2 is READY!");
+            }else{
+            $("#player-two").hide();
+            $(".dialog-card").text("Player2 disconnected...");
+            }
+        } catch (e) {
+            console.log(e.message);
+         }
     });
     //starts round
     DATA.ref("players").on("value", (snap) => {
         if (snap.child("player-one").exists() && snap.child("player-two").exists()) {
             round();
         }
-        
     });
 
     $("#pone-dc").on("click", function () {
@@ -63,7 +78,13 @@ $(document).ready(function () {
 
     function backWards(){
     DATA.ref("choice").once("value", function(snap) {
-        console.log(snap.val());
+        if(snap.child("player-one").exists()){
+            $(".dialog-card").text("Player1 made his choice..");
+        }
+        if(snap.child("player-two").exists()){
+                $(".dialog-card").text("Player2 made his choice..");
+        }
+        
         if (snap.child("player-one").exists() && snap.child("player-two").exists()) {
             compare(snap);
             DATA.ref("choice").off("value");
@@ -112,7 +133,7 @@ $(document).ready(function () {
             $(".dialog-card").text("Draw");
         } else {
             if ((p1 == "rock" && p2 == "scissors") || (p1 == "paper" && p2 == "rock") || (p1 == "scissors" && p2 == "paper")) {
-                $(".dialog-card").text("Player One wins");
+                $(".dialog-card").text("Player 1 wins");
                 DATA.ref("players/player-one/wins").transaction((wins)=>{
                     return (wins || 0) + 1;
                 });
@@ -121,7 +142,7 @@ $(document).ready(function () {
                 });
             } else {
                 if ((p1 == "rock" && p2 == "paper") || (p1 == "paper" && p2 == "scissors") || (p1 == "scissors" && p2 == "rock")) {
-                    $(".dialog-card").text("PlayerTwo wins");
+                    $(".dialog-card").text("Player 2 wins");
                     DATA.ref("players/player-two/wins").transaction((wins)=>{
                         return (wins || 0) + 1;
                     });
