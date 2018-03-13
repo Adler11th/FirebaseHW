@@ -58,6 +58,11 @@ h2{
     width: 50px;
     display: inline-block;
     margin: 10px;
+    border: solid 3px #454646;
+    border-radius: 50%;
+}
+.choice-img:hover{
+    border: solid 3px #f73232;
 }
 .dc-btn{
     font-size: 16px;
